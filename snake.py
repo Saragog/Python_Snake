@@ -20,11 +20,10 @@ GAME_CELLS_X = 50
 GAME_CELLS_Y = 25
 random.seed(a=1)
 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
 
 colours = {}
+colours['WHITE'] = (255, 255, 255)
+colours['BLACK'] = (0, 0, 0)
 colours['BACKGROUND'] = (0, 0, 0)
 colours['HEAD'] = (200, 200, 200)
 colours['BODY1'] = (255, 0, 0)
@@ -185,9 +184,17 @@ def draw_background(surface):
     )
     pygame.draw.rect(surface, colours.get('BACKGROUND'), position)
 
-def show_menu():
-    is_menu_opened = True
+def text_objects(text, font):
+    textSurface = font.render(text, True, colours.get('BLACK'))
+    return textSurface, textSurface.get_rect()
     
+def show_menu(surface):
+    surface.fill(colours.get('WHITE'))
+    menu_text_font = pygame.font.Font('freesansbold.ttf',45)
+    TextSurf, TextRect = text_objects("Start a new game", menu_text_font)
+    TextRect.center = (400,100)
+    surface.blit(TextSurf, TextRect)
+    pygame.display.update()
     
 def run_game():
     pygame.init()
@@ -200,7 +207,6 @@ def run_game():
     )
     pygame.display.set_caption('PySnake')
     is_menu_opened = True
-    show_menu()
     food = FoodProvider()
     snake = Snake(food=food)
     while True:
@@ -216,9 +222,13 @@ def run_game():
                         sys.exit()
                     else:
                         is_menu_opened = True
+                elif event.key == pygame.K_RETURN:
+                    is_menu_opened = False
+                else:
+                    print('Not known')
             snake.process_event(event)
         if is_menu_opened:
-            show_menu()
+            show_menu(DISPLAYSURF)
         else:
             draw_background(DISPLAYSURF)
             snake.draw(DISPLAYSURF)
