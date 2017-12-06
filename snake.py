@@ -185,10 +185,12 @@ def draw_background(surface):
     )
     pygame.draw.rect(surface, colours.get('BACKGROUND'), position)
 
-
+def show_menu():
+    is_menu_opened = True
+    
+    
 def run_game():
     pygame.init()
-    # workaround for: https://github.com/pygame/pygame/issues/331
     pygame.mixer.quit()
     FPS = 10  # Frames Per Second
     fpsClock = pygame.time.Clock()
@@ -196,25 +198,36 @@ def run_game():
         (GAME_CELLS_X * GAME_CELL_SIZE_PX, GAME_CELLS_Y * GAME_CELL_SIZE_PX),
         pygame.RESIZABLE
     )
-    pygame.display.set_caption('Moving segments with snake class')
+    pygame.display.set_caption('PySnake')
+    is_menu_opened = True
+    show_menu()
     food = FoodProvider()
     snake = Snake(food=food)
     while True:
         for event in pygame.event.get():
             print('event: {}'.format(event))
-            if event.type == QUIT:
+            if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    if is_menu_opened:
+                        pygame.quit()
+                        sys.exit()
+                    else:
+                        is_menu_opened = True
             snake.process_event(event)
-        draw_background(DISPLAYSURF)
-        snake.draw(DISPLAYSURF)
-        food.draw(DISPLAYSURF)
-        snake.move()
-        if snake.is_game_over() == True:
-          snake = Snake(food = food)
-        pygame.display.update()
-        fpsClock.tick(FPS)
-
+        if is_menu_opened:
+            show_menu()
+        else:
+            draw_background(DISPLAYSURF)
+            snake.draw(DISPLAYSURF)
+            food.draw(DISPLAYSURF)
+            snake.move()
+            if snake.is_game_over() == True:
+                snake = Snake(food = food)
+            pygame.display.update()
+            fpsClock.tick(FPS)
 
 if __name__ == '__main__':
     run_game()
